@@ -10,14 +10,12 @@ const userSchema = new mongoose.Schema({
    timestamps:true 
 })
 
-userSchema.pre("save",(next)=>{
+userSchema.pre("save",function(next){
     if(!this.isModified("password")) return next()
 
-    bcrypt.hash(this.password, 8, function(err, hash) {
-        if(err) return next(err)
-        user.password = hash
-        return next()
-    });
+   this.password = bcrypt.hashSync(this.password, 8);
+   return next()
+   
 })
 
 module.exports = mongoose.model("users",userSchema)
