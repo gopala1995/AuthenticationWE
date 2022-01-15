@@ -1,5 +1,6 @@
 
 require("dotenv").config()
+
 const jwt = require("jsonwebtoken")
 
 const User = require("../models/user.model")
@@ -28,7 +29,25 @@ const register = async(req,res)=>{
 }
 
 const login = async(req,res)=>{
-    return res.send("Log-in")
+   
+
+    try{
+
+    let user = await User.findOne({email:req.body.email}) 
+
+    if(!user) return res.status(400).send({message:"pls Enter valid userid and password"})
+
+    const match = user.checkPassword(req.body.password)
+
+    if(!match) return res.status(400).send({message:"pls Enter valid userid and password"})
+
+    const token = newToken(user) 
+    
+    return res.status(201).send({user,token})
+
+    }catch(err){
+       return res.status(500).send({message:err.message})
+   }
 }
 
 module.exports = {register,login}
